@@ -10,7 +10,8 @@ export function securityMiddleware(config: Config): RequestHandler[] {
       directives: {
         defaultSrc: ["'self'"],
         scriptSrc: ["'self'", "https://unpkg.com"],
-        styleSrc: ["'self'", "'unsafe-inline'"],
+        styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+        fontSrc: ["'self'", "https://fonts.gstatic.com"],
         imgSrc: ["'self'", "data:", "blob:"],
         connectSrc: ["'self'"],
       },

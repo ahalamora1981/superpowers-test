@@ -19,8 +19,15 @@ export function calendarRoutes(db: DB) {
     let week: Date;
     try { week = parseWeek(req.query.week as string); }
     catch { week = weekStartMonday(new Date()); }
+    const weekEnd = addDays(week, 7);
+    const meetings = db.prepare(`SELECT m.*, u.display_name as organizer_name
+                                FROM meetings m JOIN users u ON u.id = m.organizer_id
+                                WHERE m.status = 'scheduled'
+                                  AND m.start_utc < ?
+                                  AND m.end_utc > ?`)
+      .all(weekEnd.toISOString(), week.toISOString()) as any[];
     const user = db.prepare('SELECT id, role, display_name, timezone FROM users WHERE id = ?').get(req.session.userId);
-    res.render('calendar', { title: 'Calendar', week, user });
+    res.render('calendar', { title: 'Calendar', week, user, meetings, userTimezone: user?.timezone || 'UTC', activePage: 'calendar' });
   });
 
   r.get('/calendar', requireAuth, (req, res) => {
@@ -34,7 +41,8 @@ export function calendarRoutes(db: DB) {
                                   AND m.start_utc < ?
                                   AND m.end_utc > ?`)
       .all(weekEnd.toISOString(), week.toISOString()) as any[];
-    res.render('calendarGrid', { week, meetings, startHour: cfg.calendarStartHour, endHour: cfg.calendarEndHour });
+    const user = db.prepare('SELECT timezone FROM users WHERE id = ?').get(req.session.userId);
+    res.render('calendarGrid', { week, meetings, startHour: cfg.calendarStartHour, endHour: cfg.calendarEndHour, userTimezone: user?.timezone || 'UTC' });
   });
 
   return r;

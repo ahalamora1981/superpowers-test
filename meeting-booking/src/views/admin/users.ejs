@@ -1,52 +1,89 @@
 <%- include('../partials/header') %>
-<main>
-  <h1>Users</h1>
-  <% if (typeof error !== 'undefined' && error) { %><p class="error"><%= error %></p><% } %>
-  <table>
-    <thead><tr><th>Username</th><th>Display name</th><th>Email</th><th>Role</th><th>Time zone</th><th></th></tr></thead>
-    <tbody>
-      <% users.forEach(function(u) { %>
+<div class="main-wrap">
+  <h1 class="page-title">User management</h1>
+
+  <% if (typeof error !== 'undefined' && error) { %>
+    <div class="alert alert-error"><%= error %></div>
+  <% } %>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
         <tr>
-          <td><%= u.username %></td>
-          <td><%= u.display_name %></td>
-          <td><%= u.email %></td>
-          <td><%= u.role %></td>
-          <td><%= u.timezone %></td>
-          <td>
-            <% if (u.id !== (currentUser && currentUser.id)) { %>
-              <form method="POST" action="/admin/users/<%= u.id %>/delete" style="display:inline"
-                    onsubmit="return confirm('Delete user <%= u.username %>?')">
-                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                <button type="submit">Delete</button>
-              </form>
-            <% } %>
-          </td>
+          <th>Username</th>
+          <th>Display name</th>
+          <th>Email</th>
+          <th>Role</th>
+          <th>Time zone</th>
+          <th></th>
         </tr>
-      <% }); %>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+        <% users.forEach(function(u) { %>
+          <tr>
+            <td><strong><%= u.username %></strong></td>
+            <td><%= u.display_name %></td>
+            <td><%= u.email %></td>
+            <td><span class="badge <%= u.role === 'admin' ? 'badge-admin' : 'badge-member' %>"><%= u.role %></span></td>
+            <td><%= u.timezone %></td>
+            <td>
+              <% if (u.id !== (currentUser && currentUser.id)) { %>
+                <form method="POST" action="/admin/users/<%= u.id %>/delete" style="display:inline"
+                      onsubmit="return confirm('Delete user <%= u.username %>?')">
+                  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                  <button type="submit" class="btn btn-ghost btn-sm text-error">Delete</button>
+                </form>
+              <% } %>
+            </td>
+          </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  </div>
 
   <h2>Add user</h2>
-  <form method="POST" action="/admin/users">
-    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-    <label>Username <input name="username" required></label>
-    <label>Display name <input name="display_name" required></label>
-    <label>Email <input name="email" type="email" required></label>
-    <label>Time zone
-      <select name="timezone" required>
-        <% (() => { try { return Intl.supportedValuesOf('timeZone'); } catch { return ['UTC']; } })().forEach(function(tz) { %>
-          <option value="<%= tz %>"><%= tz %></option>
-        <% }); %>
-      </select>
-    </label>
-    <label>Role
-      <select name="role">
-        <option value="member">member</option>
-        <option value="admin">admin</option>
-      </select>
-    </label>
-    <label>Password <input name="password" type="password" required minlength="12"></label>
-    <button type="submit">Create user</button>
-  </form>
-</main>
+  <div class="card" style="max-width:540px">
+    <form method="POST" action="/admin/users">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="username">Username</label>
+          <input id="username" name="username" required>
+        </div>
+        <div class="form-group">
+          <label for="display_name">Display name</label>
+          <input id="display_name" name="display_name" required>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input id="email" name="email" type="email" required>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="timezone">Time zone</label>
+          <select id="timezone" name="timezone" required>
+            <% (() => { try { return Intl.supportedValuesOf('timeZone'); } catch { return ['UTC']; } })().forEach(function(tz) { %>
+              <option value="<%= tz %>"><%= tz %></option>
+            <% }); %>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="role">Role</label>
+          <select id="role" name="role">
+            <option value="member">member</option>
+            <option value="admin">admin</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input id="password" name="password" type="password" required minlength="12" autocomplete="new-password">
+      </div>
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">Create user</button>
+      </div>
+    </form>
+  </div>
+</div>
 <%- include('../partials/footer') %>

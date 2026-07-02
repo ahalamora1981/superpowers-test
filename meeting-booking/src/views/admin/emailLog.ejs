@@ -1,19 +1,36 @@
 <%- include('../partials/header') %>
-<main>
-  <h1>Email log</h1>
-  <table>
-    <thead><tr><th>When</th><th>Kind</th><th>Recipient</th><th>Status</th><th>Error</th></tr></thead>
-    <tbody>
-      <% rows.forEach(function(r) { %>
-        <tr class="<%= r.status %>">
-          <td><%= r.sent_at %></td>
-          <td><%= r.kind %></td>
-          <td><%= r.recipient %></td>
-          <td><%= r.status %></td>
-          <td><%= r.error || '' %></td>
+<div class="main-wrap">
+  <h1 class="page-title">Email log</h1>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>When</th>
+          <th>Kind</th>
+          <th>Recipient</th>
+          <th>Status</th>
+          <th>Error</th>
         </tr>
-      <% }); %>
-    </tbody>
-  </table>
-</main>
+      </thead>
+      <tbody>
+        <% rows.forEach(function(r) { %>
+          <tr>
+            <td><%= r.sent_at %></td>
+            <td><%= r.kind %></td>
+            <td><%= r.recipient %></td>
+            <td><span class="badge <%= r.status === 'sent' ? 'badge-sent' : 'badge-failed' %>"><%= r.status %></span></td>
+            <td class="text-muted"><%= r.error || '—' %></td>
+          </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  </div>
+
+  <% if (rows.length === 0) { %>
+    <div class="empty">
+      <p>No emails sent yet.</p>
+    </div>
+  <% } %>
+</div>
 <%- include('../partials/footer') %>

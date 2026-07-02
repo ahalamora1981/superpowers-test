@@ -1,23 +1,49 @@
 <%
+  const tz = userTimezone || 'UTC';
   const days = [0,1,2,3,4,5,6].map(function(i) { return addDays(week, i); });
   const hours = [];
   for (let h = startHour; h < endHour; h++) hours.push(h);
+  const dayNames = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+
+  // Convert a UTC date string to a Date in the user's timezone
+  function toLocal(utcStr) {
+    return new Date(utcStr);
+  }
+  // Get the local date string (YYYY-MM-DD) for a UTC instant in user's tz
+  function localDate(utcStr) {
+    return toLocal(utcStr).toLocaleDateString('en-CA', { timeZone: tz }); // en-CA gives YYYY-MM-DD
+  }
+  // Get the local hour for a UTC instant in user's tz
+  function localHour(utcStr) {
+    return parseInt(toLocal(utcStr).toLocaleString('en-US', { timeZone: tz, hour: 'numeric', hour12: false }), 10);
+  }
+  // Format day header in user's tz
+  function dayLabel(d) {
+    return d.toLocaleDateString('en-CA', { timeZone: tz });
+  }
+  function dayName(d) {
+    return d.toLocaleDateString('en-US', { timeZone: tz, weekday: 'short' });
+  }
 %>
+<div class="cal-grid-wrap">
 <table class="cal">
   <thead>
     <tr>
+      <th></th>
       <% days.forEach(function(d) { %>
-        <th><%= d.toISOString().slice(5,10) %><br><small><%= ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'][d.getUTCDay() === 0 ? 6 : d.getUTCDay() - 1] %></small></th>
+        <th><%= dayLabel(d) %><br><small><%= dayName(d) %></small></th>
       <% }); %>
     </tr>
   </thead>
   <tbody>
     <% hours.forEach(function(h) { %>
       <tr>
+        <td class="hour-label"><%= String(h).padStart(2,'0') %>:00</td>
         <% days.forEach(function(d) { %>
           <td>
-            <% meetings.filter(function(m) { return m.start_utc.slice(0,10) === d.toISOString().slice(0,10) && new Date(m.start_utc).getUTCHours() === h; }).forEach(function(m) { %>
-              <a class="block" href="/meetings/<%= m.id %>" style="display:block"><%= m.title %><br><small><%= m.organizer_name %></small></a>
+            <% var dayStr = dayLabel(d); %>
+            <% meetings.filter(function(m) { return localDate(m.start_utc) === dayStr && localHour(m.start_utc) === h; }).forEach(function(m) { %>
+              <a class="block" href="/meetings/<%= m.id %>" title="<%= m.title %> — <%= m.organizer_name %>"><%= m.title %><br><small><%= m.organizer_name %></small></a>
             <% }); %>
           </td>
         <% }); %>
@@ -25,3 +51,4 @@
     <% }); %>
   </tbody>
 </table>
+</div>

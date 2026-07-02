@@ -1,22 +1,43 @@
 <%- include('partials/header') %>
-<main>
-  <h1>Profile</h1>
-  <% if (error) { %><p class="error"><%= error %></p><% } %>
-  <% if (success) { %><p class="success"><%= success %></p><% } %>
-  <form method="POST" action="/profile">
-    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-    <label>Display name <input name="display_name" value="<%= user.display_name %>" required></label>
-    <label>Email <input name="email" type="email" value="<%= user.email %>" required></label>
-    <label>Time zone
-      <select name="timezone" required>
-        <% (() => { try { return Intl.supportedValuesOf('timeZone'); } catch { return ['UTC']; } })().forEach(function(tz) { %>
-          <option value="<%= tz %>" <%= tz === user.timezone ? 'selected' : '' %>><%= tz %></option>
-        <% }); %>
-      </select>
-    </label>
-    <label>Current password (required to change password) <input name="current_password" type="password"></label>
-    <label>New password (leave blank to keep current) <input name="new_password" type="password" minlength="12"></label>
-    <button type="submit">Save</button>
-  </form>
-</main>
+<div class="main-wrap">
+  <h1 class="page-title">Profile</h1>
+
+  <% if (error) { %><div class="alert alert-error"><%= error %></div><% } %>
+  <% if (success) { %><div class="alert alert-success"><%= success %></div><% } %>
+
+  <div class="card" style="max-width:540px">
+    <form method="POST" action="/profile">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <div class="form-group">
+        <label for="display_name">Display name</label>
+        <input id="display_name" name="display_name" value="<%= user.display_name %>" required>
+      </div>
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input id="email" name="email" type="email" value="<%= user.email %>" required>
+      </div>
+      <div class="form-group">
+        <label for="timezone">Time zone</label>
+        <select id="timezone" name="timezone" required>
+          <% (() => { try { return Intl.supportedValuesOf('timeZone'); } catch { return ['UTC']; } })().forEach(function(tz) { %>
+            <option value="<%= tz %>" <%= tz === user.timezone ? 'selected' : '' %>><%= tz %></option>
+          <% }); %>
+        </select>
+      </div>
+      <hr class="divider">
+      <div class="form-group">
+        <label for="current_password">Current password <small class="text-muted">(required to change password)</small></label>
+        <input id="current_password" name="current_password" type="password" autocomplete="current-password">
+      </div>
+      <div class="form-group">
+        <label for="new_password">New password <small class="text-muted">(leave blank to keep current)</small></label>
+        <input id="new_password" name="new_password" type="password" minlength="12" autocomplete="new-password">
+      </div>
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">Save changes</button>
+        <a href="/" class="btn btn-secondary">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
 <%- include('partials/footer') %>

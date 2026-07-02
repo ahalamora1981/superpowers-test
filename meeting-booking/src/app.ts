@@ -32,6 +32,7 @@ export function createApp(config: Config, deps: CreateAppDeps = {}) {
   app.set('view engine', 'ejs');
   app.set('views', path.join(__dirname, 'views'));
   app.locals.addDays = addDays;
+  app.use('/static', express.static(path.join(__dirname, 'static')));
   app.use(bodyParser.urlencoded({ extended: false }));
   app.use(session({
     secret: config.sessionSecret,

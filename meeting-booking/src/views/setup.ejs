@@ -1,22 +1,43 @@
 <%- include('partials/header') %>
-<main>
-  <h1>Initial setup</h1>
-  <p>Create the first admin user to start using the meeting system.</p>
-  <% if (typeof error !== 'undefined' && error) { %><p class="error"><%= error %></p><% } %>
-  <form method="POST" action="/setup">
-    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-    <label>Username <input name="username" required minlength="3" autofocus></label>
-    <label>Display name <input name="display_name" required></label>
-    <label>Email <input name="email" type="email" required></label>
-    <label>Time zone
-      <select name="timezone" required>
-        <% (() => { try { return Intl.supportedValuesOf('timeZone'); } catch { return ['UTC']; } })().forEach(function(tz) { %>
-          <option value="<%= tz %>" <%= tz === (locals && locals.defaultTimezone) ? 'selected' : '' %>><%= tz %></option>
-        <% }); %>
-      </select>
-    </label>
-    <label>Password <input name="password" type="password" required minlength="12"></label>
-    <button type="submit">Create admin</button>
-  </form>
-</main>
+<div class="auth-page">
+  <div class="auth-card" style="max-width:480px">
+    <h1>Initial setup</h1>
+    <p class="subtitle">Create the first admin to start using the meeting system.</p>
+    <% if (typeof error !== 'undefined' && error) { %>
+      <div class="alert alert-error"><%= error %></div>
+    <% } %>
+    <form method="POST" action="/setup">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="username">Username</label>
+          <input id="username" name="username" required minlength="3" autofocus autocomplete="username">
+        </div>
+        <div class="form-group">
+          <label for="display_name">Display name</label>
+          <input id="display_name" name="display_name" required>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input id="email" name="email" type="email" required autocomplete="email">
+      </div>
+      <div class="form-group">
+        <label for="timezone">Time zone</label>
+        <select id="timezone" name="timezone" required>
+          <% (() => { try { return Intl.supportedValuesOf('timeZone'); } catch { return ['UTC']; } })().forEach(function(tz) { %>
+            <option value="<%= tz %>" <%= tz === (locals && locals.defaultTimezone) ? 'selected' : '' %>><%= tz %></option>
+          <% }); %>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input id="password" name="password" type="password" required minlength="12" autocomplete="new-password">
+      </div>
+      <div class="form-actions" style="justify-content:center">
+        <button type="submit" class="btn btn-primary">Create admin</button>
+      </div>
+    </form>
+  </div>
+</div>
 <%- include('partials/footer') %>

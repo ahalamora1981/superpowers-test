@@ -3,8 +3,32 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title><%= typeof title !== 'undefined' && title ? title + ' — ' : '' %>Meetings</title>
+  <title><%= typeof title !== 'undefined' && title ? title + ' — ' : '' %>Meeting Booking</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/static/styles.css">
   <script src="https://unpkg.com/htmx.org@2.0.2"></script>
 </head>
 <body>
+<header class="top-nav">
+  <a href="/" class="brand">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+    Meeting Booking
+  </a>
+  <% if (typeof user !== 'undefined' && user) { %>
+  <nav>
+    <a href="/" class="<%= typeof activePage !== 'undefined' && activePage === 'calendar' ? 'active' : '' %>">Calendar</a>
+    <a href="/my-meetings" class="<%= typeof activePage !== 'undefined' && activePage === 'myMeetings' ? 'active' : '' %> hide-mobile">My meetings</a>
+    <a href="/meetings/new" class="btn btn-primary btn-sm">+ New</a>
+    <% if (user.role === 'admin') { %>
+    <a href="/admin/users" class="hide-mobile">Admin</a>
+    <% } %>
+    <a href="/profile" class="nav-user hide-mobile"><%= user.display_name %></a>
+    <form method="POST" action="/logout" style="display:inline">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <button type="submit" class="btn-ghost" style="background:none;border:none;color:var(--color-muted);font-family:var(--font-body);font-size:0.875rem;font-weight:500;cursor:pointer;padding:var(--sp-xs) var(--sp-sm);">Logout</button>
+    </form>
+  </nav>
+  <% } %>
+</header>
