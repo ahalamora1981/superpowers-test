@@ -1,18 +1,34 @@
 <%- include('../partials/header') %>
-<main>
-  <h1>All meetings</h1>
-  <table>
-    <thead><tr><th>Title</th><th>Organizer</th><th>Start (UTC)</th><th>Status</th></tr></thead>
-    <tbody>
-      <% rows.forEach(function(m) { %>
+<div class="main-wrap">
+  <h1 class="page-title">All meetings</h1>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
         <tr>
-          <td><a href="/meetings/<%= m.id %>"><%= m.title %></a></td>
-          <td><%= m.organizer_name %></td>
-          <td><%= m.start_utc %></td>
-          <td><%= m.status %></td>
+          <th>Title</th>
+          <th>Organizer</th>
+          <th>Start (UTC)</th>
+          <th>Status</th>
         </tr>
-      <% }); %>
-    </tbody>
-  </table>
-</main>
+      </thead>
+      <tbody>
+        <% rows.forEach(function(m) { %>
+          <tr>
+            <td><a href="/meetings/<%= m.id %>"><strong><%= m.title %></strong></a></td>
+            <td><%= m.organizer_name %></td>
+            <td><%= m.start_utc %></td>
+            <td><span class="badge <%= m.status === 'cancelled' ? 'badge-cancelled' : 'badge-scheduled' %>"><%= m.status %></span></td>
+          </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  </div>
+
+  <% if (rows.length === 0) { %>
+    <div class="empty">
+      <p>No meetings scheduled yet.</p>
+    </div>
+  <% } %>
+</div>
 <%- include('../partials/footer') %>

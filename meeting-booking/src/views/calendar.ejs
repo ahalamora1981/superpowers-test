@@ -1,14 +1,13 @@
 <%- include('partials/header') %>
-<main>
-  <h1>Calendar — week of <%= week.toISOString().slice(0,10) %></h1>
-  <div>
-    <button hx-get="/calendar?week=<%= addDays(week, -7).toISOString().slice(0,10) %>" hx-target="#calgrid" hx-swap="outerHTML">‹ Prev</button>
-    <button hx-get="/calendar?week=<%= new Date().toISOString().slice(0,10) %>" hx-target="#calgrid" hx-swap="outerHTML">Today</button>
-    <button hx-get="/calendar?week=<%= addDays(week, 7).toISOString().slice(0,10) %>" hx-target="#calgrid" hx-swap="outerHTML">Next ›</button>
+<div class="main-wrap">
+  <div class="cal-nav">
+    <h1 class="cal-title">Week of <%= week.toISOString().slice(0,10) %></h1>
+    <button class="btn btn-ghost" hx-get="/calendar?week=<%= addDays(week, -7).toISOString().slice(0,10) %>" hx-target="#calgrid" hx-swap="outerHTML">← Prev</button>
+    <button class="btn btn-secondary btn-sm" hx-get="/calendar?week=<%= new Date().toISOString().slice(0,10) %>" hx-target="#calgrid" hx-swap="outerHTML">Today</button>
+    <button class="btn btn-ghost" hx-get="/calendar?week=<%= addDays(week, 7).toISOString().slice(0,10) %>" hx-target="#calgrid" hx-swap="outerHTML">Next →</button>
   </div>
   <div id="calgrid">
-    <%- include('calendarGrid', { week, meetings: [], startHour: 7, endHour: 21 }) %>
+    <%- include('calendarGrid', { week, meetings: meetings || [], startHour: 7, endHour: 21 }) %>
   </div>
-  <p><a href="/meetings/new">+ New meeting</a> | <a href="/my-meetings">My meetings</a> | <% if (user && user.role === 'admin') { %><a href="/admin/users">Users</a> | <% } %><a href="/profile">Profile</a> | <a href="/logout">Logout</a></p>
-</main>
+</div>
 <%- include('partials/footer') %>

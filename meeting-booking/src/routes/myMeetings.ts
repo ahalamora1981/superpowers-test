@@ -10,7 +10,7 @@ export function myMeetingsRoutes(db: DB) {
                                  ORDER BY start_utc ASC`).all(req.session.userId, now);
     const past = db.prepare(`SELECT * FROM meetings WHERE organizer_id = ? AND (status = 'cancelled' OR end_utc <= ?)
                              ORDER BY start_utc DESC LIMIT 50`).all(req.session.userId, now);
-    res.render('myMeetings', { title: 'My meetings', upcoming, past });
+    res.render('myMeetings', { title: 'My meetings', upcoming, past, activePage: 'myMeetings' });
   });
   return r;
 }

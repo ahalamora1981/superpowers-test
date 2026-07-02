@@ -41,7 +41,7 @@ describe('calendar', () => {
     const res = await request(app()).get('/');
     expect(res.status).toBe(200);
     expect(res.text).toMatch(/<table/);
-    expect(res.text).toContain('Calendar — week of');
+    expect(res.text).toContain('Week of');
     expect(res.text).toContain('Today');
   });
 
