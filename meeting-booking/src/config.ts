@@ -5,7 +5,7 @@ const Schema = z.object({
   APP_HOSTNAME: z.string().min(1),
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
   PORT: z.coerce.number().int().positive().default(3000),
-  HTTPS: z.coerce.boolean().default(false),
+  HTTPS: z.enum(['true', 'false']).transform((v) => v === 'true').default('false' as const),
   SESSION_SECRET: z.string().min(32, 'SESSION_SECRET must be at least 32 chars'),
 
   DATABASE_PATH: z.string().min(1).default('./data/app.db'),
@@ -13,7 +13,7 @@ const Schema = z.object({
 
   SMTP_HOST: z.string().min(1),
   SMTP_PORT: z.coerce.number().int().positive(),
-  SMTP_SECURE: z.coerce.boolean().default(false),
+  SMTP_SECURE: z.enum(['true', 'false']).transform((v) => v === 'true').default('false' as const),
   SMTP_USER: z.string().default(''),
   SMTP_PASS: z.string().default(''),
   SMTP_FROM: z.string().min(1),

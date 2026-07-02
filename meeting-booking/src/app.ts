@@ -36,7 +36,7 @@ export function createApp(config: Config, deps: CreateAppDeps = {}) {
   app.use(session({
     secret: config.sessionSecret,
     resave: false,
-    saveUninitialized: false,
+    saveUninitialized: true,
     cookie: { httpOnly: true, sameSite: 'lax', secure: config.https },
   }));
   app.use(securityMiddleware(config));
