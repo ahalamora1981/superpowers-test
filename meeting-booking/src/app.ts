@@ -9,7 +9,15 @@ import { csrfProtection } from './middleware/csrf.js';
 import { exposeLocals } from './middleware/locals.js';
 import { securityMiddleware } from './middleware/security.js';
 import { notFoundHandler, errorHandler } from './middleware/errorHandler.js';
+import { firstRunGate } from './middleware/firstRunGate.js';
 import { openDb, runMigrations } from './db.js';
+import { authRoutes } from './routes/auth.js';
+import { setupRoutes } from './routes/setup.js';
+import { calendarRoutes } from './routes/calendar.js';
+import { meetingRoutes } from './routes/meetings.js';
+import { adminRoutes } from './routes/admin.js';
+import { profileRoutes } from './routes/profile.js';
+import { myMeetingsRoutes } from './routes/myMeetings.js';
 import { addDays } from './lib/time.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -41,7 +49,18 @@ export function createApp(config: Config, deps: CreateAppDeps = {}) {
     catch (err) { res.status(503).json({ ok: false, db: 'down', error: (err as Error).message }); }
   });
 
-  // App routes are mounted by server.ts (see Task 17).
+  // First-run gate: redirect to /setup if no users.
+  app.use(firstRunGate(db));
+
+  // App routes
+  app.use(authRoutes(db));
+  app.use(setupRoutes(db));
+  app.use(calendarRoutes(db));
+  app.use(meetingRoutes(db));
+  app.use(adminRoutes(db));
+  app.use(profileRoutes(db));
+  app.use(myMeetingsRoutes(db));
+
   app.use(notFoundHandler);
   app.use(errorHandler);
   (app as any).__db = db;

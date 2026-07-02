@@ -46,11 +46,13 @@ describe('security + health + errors', () => {
     });
   });
 
-  it('unknown route renders 404', () => {
+  it('unknown route renders 404 when users exist', () => {
     makeEnv();
     const db = openDb(':memory:');
     runMigrations(db);
-    const app = createApp(loadConfig(), { db });
+    db.prepare(`INSERT INTO users (username, password_hash, role, timezone, display_name, email, created_at)
+                VALUES ('u', 'h', 'admin', 'UTC', 'U', 'u@x.com', ?)`).run(new Date().toISOString());
+    const app = createApp(loadConfig(), { db, autoMigrate: false });
     return request(app).get('/this/does/not/exist').then((res) => {
       expect(res.status).toBe(404);
     });
