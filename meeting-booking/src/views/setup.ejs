@@ -1,0 +1,22 @@
+<%- include('partials/header') %>
+<main>
+  <h1>Initial setup</h1>
+  <p>Create the first admin user to start using the meeting system.</p>
+  <% if (typeof error !== 'undefined' && error) { %><p class="error"><%= error %></p><% } %>
+  <form method="POST" action="/setup">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+    <label>Username <input name="username" required minlength="3" autofocus></label>
+    <label>Display name <input name="display_name" required></label>
+    <label>Email <input name="email" type="email" required></label>
+    <label>Time zone
+      <select name="timezone" required>
+        <% (() => { try { return Intl.supportedValuesOf('timeZone'); } catch { return ['UTC']; } })().forEach(function(tz) { %>
+          <option value="<%= tz %>" <%= tz === (locals && locals.defaultTimezone) ? 'selected' : '' %>><%= tz %></option>
+        <% }); %>
+      </select>
+    </label>
+    <label>Password <input name="password" type="password" required minlength="12"></label>
+    <button type="submit">Create admin</button>
+  </form>
+</main>
+<%- include('partials/footer') %>
