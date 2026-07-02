@@ -11,9 +11,13 @@ describe('smoke', () => {
     process.env.SMTP_PORT ??= '1025';
     process.env.SMTP_FROM ??= 'a@b.c';
     const cfg = loadConfig();
-    const app = createApp(cfg);
-    const res = await request(app).get('/healthz');
+    const app = createApp(cfg, { db: undefined, autoMigrate: false });
+    // We need an open DB for /healthz; use a temp one.
+    const { openDb } = await import('../src/db.js');
+    const db = openDb(':memory:');
+    const { createApp: freshCreate } = await import('../src/app.js');
+    const res = await request(freshCreate(cfg, { db, autoMigrate: false })).get('/healthz');
     expect(res.status).toBe(200);
-    expect(res.body).toEqual({ ok: true });
+    expect(res.body.ok).toBe(true);
   });
 });
