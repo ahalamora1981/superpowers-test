@@ -94,3 +94,37 @@ export async function sendInvitesFor(args: SendInvitesArgs): Promise<{ sent: num
 function escapeHtml(s: string): string {
   return s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]!));
 }
+
+export interface UpdateMeetingInput extends Omit<CreateMeetingInput, 'attendees'> {
+  meetingId: number;
+  attendees: AttendeeInput[];
+}
+
+export async function updateMeeting(input: UpdateMeetingInput): Promise<{ meeting: MeetingRow; sentCount: number; failedCount: number }> {
+  const { db, mailer, video, hostname, meetingId, organizer, title, description, startUtc, endUtc, timezone, attendees } = input;
+  const now = new Date().toISOString();
+  transaction(db, () => {
+    db.prepare(`UPDATE meetings SET title = ?, description = ?, start_utc = ?, end_utc = ?, timezone = ?,
+                                    sequence = sequence + 1, updated_at = ? WHERE id = ?`)
+      .run(title, description, startUtc, endUtc, timezone, now, meetingId);
+    db.prepare('DELETE FROM participants WHERE meeting_id = ?').run(meetingId);
+    const dedup = dedupAttendees(attendees, organizer);
+    const ins = db.prepare('INSERT INTO participants (meeting_id, email, name) VALUES (?, ?, ?)');
+    for (const a of dedup) ins.run(meetingId, a.email, a.name ?? null);
+  });
+  const meeting = db.prepare('SELECT * FROM meetings WHERE id = ?').get(meetingId) as MeetingRow;
+  try { await video.updateMeeting(meetingId.toString(), { title, startUtc, endUtc }); }
+  catch { /* best-effort; email still goes out */ }
+  const parts = db.prepare('SELECT email, name FROM participants WHERE meeting_id = ?').all(meetingId) as any[];
+  const { sent, failed } = await sendInvitesFor({
+    db, mailer, hostname, meeting, organizer, attendees: parts.map((p) => ({ email: p.email, name: p.name })), kind: 'update',
+  });
+  return { meeting, sentCount: sent, failedCount: failed };
+}
+
+export async function cancelMeeting(input: { db: DB; mailer: any; hostname: string; meeting: MeetingRow; organizer: OrganizerInfo; attendees: AttendeeInput[]; }): Promise<{ sentCount: number; failedCount: number }> {
+  const { db, mailer, hostname, meeting, organizer, attendees } = input;
+  db.prepare("UPDATE meetings SET status = 'cancelled', updated_at = ? WHERE id = ?").run(new Date().toISOString(), meeting.id);
+  const { sent, failed } = await sendInvitesFor({ db, mailer, hostname, meeting, organizer, attendees, kind: 'cancel' });
+  return { sentCount: sent, failedCount: failed };
+}

@@ -1,0 +1,20 @@
+<%- include('../partials/header') %>
+<main>
+  <h1><%= meeting ? 'Edit meeting' : 'New meeting' %></h1>
+  <% if (typeof error !== 'undefined' && error) { %><p class="error"><%= error %></p><% } %>
+  <% if (typeof conflict !== 'undefined' && conflict) { %>
+    <p class="warning">You already have a meeting "<%= conflict.title %>" from <%= conflict.start_utc %> to <%= conflict.end_utc %>. <a href="?override=1">Book anyway</a></p>
+  <% } %>
+  <form method="POST" action="<%= meeting ? '/meetings/' + meeting.id : '/meetings' %>">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+    <label>Title <input name="title" value="<%= meeting ? meeting.title : '' %>" required maxlength="200"></label>
+    <label>Description <textarea name="description" maxlength="5000"><%= meeting ? meeting.description : '' %></textarea></label>
+    <label>Start <input name="start" type="datetime-local" value="<%= meeting ? meeting.start_local : (typeof defaultStart !== 'undefined' ? defaultStart : '') %>" required></label>
+    <label>End <input name="end" type="datetime-local" value="<%= meeting ? meeting.end_local : '' %>" required></label>
+    <label>Attendees (one email per line)
+      <textarea name="attendees" rows="6"><%= meeting ? meeting.attendees_text : '' %></textarea>
+    </label>
+    <button type="submit"><%= meeting ? 'Save' : 'Create' %></button>
+  </form>
+</main>
+<%- include('../partials/footer') %>
