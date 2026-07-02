@@ -1,0 +1,27 @@
+<%
+  const days = [0,1,2,3,4,5,6].map(function(i) { return addDays(week, i); });
+  const hours = [];
+  for (let h = startHour; h < endHour; h++) hours.push(h);
+%>
+<table class="cal">
+  <thead>
+    <tr>
+      <% days.forEach(function(d) { %>
+        <th><%= d.toISOString().slice(5,10) %><br><small><%= ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'][d.getUTCDay() === 0 ? 6 : d.getUTCDay() - 1] %></small></th>
+      <% }); %>
+    </tr>
+  </thead>
+  <tbody>
+    <% hours.forEach(function(h) { %>
+      <tr>
+        <% days.forEach(function(d) { %>
+          <td>
+            <% meetings.filter(function(m) { return m.start_utc.slice(0,10) === d.toISOString().slice(0,10) && new Date(m.start_utc).getUTCHours() === h; }).forEach(function(m) { %>
+              <a class="block" href="/meetings/<%= m.id %>" style="display:block"><%= m.title %><br><small><%= m.organizer_name %></small></a>
+            <% }); %>
+          </td>
+        <% }); %>
+      </tr>
+    <% }); %>
+  </tbody>
+</table>

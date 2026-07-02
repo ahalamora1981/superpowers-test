@@ -7,6 +7,7 @@ import type { DB } from '../../src/db.js';
 import type { Config } from '../../src/config.js';
 import { csrfProtection, getCsrfToken } from '../../src/middleware/csrf.js';
 import { exposeLocals } from '../../src/middleware/locals.js';
+import { addDays } from '../../src/lib/time.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -14,6 +15,7 @@ export function buildTestApp(config: Config, db: DB) {
   const app = express();
   app.set('view engine', 'ejs');
   app.set('views', path.join(__dirname, '..', '..', 'src', 'views'));
+  app.locals.addDays = addDays;
   app.use(bodyParser.urlencoded({ extended: false }));
   app.use(session({
     secret: config.sessionSecret,
