@@ -1,0 +1,21 @@
+<%- include('partials/header') %>
+<main>
+  <h1>My meetings</h1>
+  <h2>Upcoming</h2>
+  <% if (upcoming.length === 0) { %><p>None.</p><% } else { %>
+    <ul>
+      <% upcoming.forEach(function(m) { %>
+        <li><a href="/meetings/<%= m.id %>"><%= m.title %></a> — <%= m.start_utc %> (<%= m.timezone %>)</li>
+      <% }); %>
+    </ul>
+  <% } %>
+  <h2>Recent past / cancelled</h2>
+  <% if (past.length === 0) { %><p>None.</p><% } else { %>
+    <ul>
+      <% past.forEach(function(m) { %>
+        <li><a href="/meetings/<%= m.id %>"><%= m.title %></a> — <%= m.start_utc %> [<%= m.status %>]</li>
+      <% }); %>
+    </ul>
+  <% } %>
+</main>
+<%- include('partials/footer') %>

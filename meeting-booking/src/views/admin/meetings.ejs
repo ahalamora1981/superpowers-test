@@ -1,0 +1,18 @@
+<%- include('../partials/header') %>
+<main>
+  <h1>All meetings</h1>
+  <table>
+    <thead><tr><th>Title</th><th>Organizer</th><th>Start (UTC)</th><th>Status</th></tr></thead>
+    <tbody>
+      <% rows.forEach(function(m) { %>
+        <tr>
+          <td><a href="/meetings/<%= m.id %>"><%= m.title %></a></td>
+          <td><%= m.organizer_name %></td>
+          <td><%= m.start_utc %></td>
+          <td><%= m.status %></td>
+        </tr>
+      <% }); %>
+    </tbody>
+  </table>
+</main>
+<%- include('../partials/footer') %>

@@ -46,5 +46,17 @@ export function adminRoutes(db: DB) {
     res.redirect('/admin/users');
   });
 
+  r.get('/admin/meetings', (req, res) => {
+    const rows = db.prepare(`SELECT m.*, u.display_name as organizer_name
+                             FROM meetings m JOIN users u ON u.id = m.organizer_id
+                             ORDER BY m.start_utc DESC LIMIT 200`).all();
+    res.render('admin/meetings', { title: 'All meetings', rows });
+  });
+
+  r.get('/admin/email-log', (req, res) => {
+    const rows = db.prepare(`SELECT * FROM email_send_log ORDER BY sent_at DESC LIMIT 200`).all();
+    res.render('admin/emailLog', { title: 'Email log', rows });
+  });
+
   return r;
 }

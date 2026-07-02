@@ -1,0 +1,19 @@
+<%- include('../partials/header') %>
+<main>
+  <h1>Email log</h1>
+  <table>
+    <thead><tr><th>When</th><th>Kind</th><th>Recipient</th><th>Status</th><th>Error</th></tr></thead>
+    <tbody>
+      <% rows.forEach(function(r) { %>
+        <tr class="<%= r.status %>">
+          <td><%= r.sent_at %></td>
+          <td><%= r.kind %></td>
+          <td><%= r.recipient %></td>
+          <td><%= r.status %></td>
+          <td><%= r.error || '' %></td>
+        </tr>
+      <% }); %>
+    </tbody>
+  </table>
+</main>
+<%- include('../partials/footer') %>
